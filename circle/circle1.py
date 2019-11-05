@@ -10,49 +10,50 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 def drawCircle(x0, y0, r):
-	x, y, p = 0, r, 1-r
-
-	L = []
-	L.append((x, y))
+	x, y, m = 0, r, 1-r
+	r = input('Enter the radius: ')
+	K = []
+	K.append((x, y))
 
 	for x in range(int(r)):
-		if p < 0:
-			p = p + 2 * x + 3
+		if m < 0:
+			m = m + 2 * x + 3
 		else:
 			y -= 1
-			p = p + 2 * x + 3 - 2 * y
+			m = m + 2 * x + 3 - 2 * y
 
-		L.append((x, y))
+		K.append((x, y))
 
 		if x >= y: break
 
-	N = L[:]
-	for i in L:
-		N.append((i[1], i[0]))
+	W = K[:]
+	for i in K:
+		W.append((i[1], i[0]))
 
-	L = N[:]
-	for i in N:
-		L.append((-i[0], i[1]))
-		L.append((i[0], -i[1]))
-		L.append((-i[0], -i[1]))
+	K = W[:]
+	for i in W:
+		K.append((-i[0], i[1]))
+		K.append((i[0], -i[1]))
+		K.append((-i[0], -i[1]))
 
-	N = []
-	for i in L:
-		N.append((x0+i[0], y0+i[1]))
+	W = []
+	for i in K:
+		W.append((x0+i[0], y0+i[1]))
 
-	return N
+	return W
 
 def projection():
 	glMatrixMode(GL_PROJECTION)
-	gluOrtho2D(0, 400, 0, 300)
+	gluOrtho2D(0, 900, 0, 600)
 
 def draw():
 	glClear(GL_COLOR_BUFFER_BIT)
-	glColor3f(1, 0, 0)
+	glColor3f(1, 1, 1)
+	
 
 	glBegin(GL_POINTS)
 
-	for i in drawCircle(150, 150, 100):
+	for i in drawCircle(500, 350, 200):
 		glVertex2iv(i)
 
 	glEnd()
@@ -60,9 +61,9 @@ def draw():
 
 def main():
 	glutInit()
-	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB)
-	glutInitWindowSize(400, 300)
-	glutInitWindowPosition(100, 120)
+	glutInitDisplayMode(GLUT_RGBA|GLUT_RGB)
+	glutInitWindowSize(900, 600)
+	glutInitWindowPosition(50, 100)
 	glutCreateWindow("Simple Point")
 	projection()
 	glutDisplayFunc(draw)

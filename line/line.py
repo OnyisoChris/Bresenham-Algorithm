@@ -1,67 +1,59 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
+def get_line(start, end):
+    """Bresenham's Line Algorithm
+    Produces a list of tuples from start and end
+ 
+    >>> points1 = get_line((0, 0), (3, 4))
+    >>> points2 = get_line((3, 4), (0, 0))
+    >>> assert(set(points1) == set(points2))
+    >>> print points1
+    [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4)]
+    >>> print points2
+    [(3, 4), (2, 3), (1, 2), (1, 1), (0, 0)]
+    """
+    # Setup initial conditions
+    x1, y1 = start
+    x2, y2 = end
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Determine how steep the line is
+    is_steep = abs(dy) > abs(dx)
+ 
+    # Rotate line
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+ 
+    # Swap start and end points if necessary and store swap state
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
+ 
+    # Recalculate differentials
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Calculate error
+    error = int(dx / 2.0)
+    ystep = 1 if y1 < y2 else -1
+ 
+    # Iterate over bounding box generating points between start and end
+    y = y1
+    points = []
+    for x in range(x1, x2 + 1):
+        coord = (y, x) if is_steep else (x, y)
+        points.append(coord)
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+ 
+    # Reverse the list if the coordinates were swapped
+    if swapped:
+        points.reverse()
+    return points
 
-endPts = (
-	(400, 300),
-	(0, 0),
-)
-
-def bresenhamPts(endPts):
-	if endPts[0][0] > endPts[1][0]:
-		endPts = endPts[::-1]
-
-	start, stop = endPts
-	dx, dy = stop[0] - start[0], abs(stop[1] - start[1])
-	twoDy, twoDyMinuxDx = 2 * dy, 2 * (dy - dx)
-	ychange = (stop[1] - start[1]) / dy
-
-	p = 2 * dy - dx
-	s = set([start])
-	x, y = start
-
-	for x in range(x + 1, stop[0]):
-		if (p < 0):
-			p += twoDy
-		else:
-			y += ychange
-			p += twoDyMinuxDx
-
-		s.add((x, y))
-
-	return s
-
-def draw():
-
-	glClear(GL_COLOR_BUFFER_BIT)
-	glColor3f(1, 0, 0,)
-	glClearColor(1, 1, 1, 1)
-
-	points = bresenhamPts(endPts)
-	glBegin(GL_POINTS)
-
-	for i in points:
-		glVertex2iv(i)
-
-	glEnd()
-	glFlush()
-
-def main():
-	glutInit()
-	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB)
-	glutInitWindowSize(400, 300)
-	glutInitWindowPosition(100, 120)
-	glutCreateWindow("Simple Point")
-	
-	glMatrixMode(GL_PROJECTION)
-	gluOrtho2D(0, 400, 0, 300)
-
-	glutDisplayFunc(draw)
-	glutMainLoop()
-
-if __name__ == "__main__":
-	main()
